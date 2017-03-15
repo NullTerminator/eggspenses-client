@@ -1,6 +1,7 @@
 import {inject} from 'aurelia-framework';
 
 import {ResourceCacheService} from './resource-cache-service';
+import extensions from './resource-extensions';
 import {HttpService} from './http-service';
 import {HttpError} from './http-error';
 
@@ -22,7 +23,15 @@ export class ResourceService {
   }
 
   all(params=null) {
-    return this.http_svc.get(this._url());
+    //TODO: cache promise based on params
+    return this.http_svc.get(this._url())
+      .then((resp) => {
+        let cleaned = [];
+        resp.data.forEach((resource) => {
+          cleaned.push(this._resource_from_response(resource));
+        });
+        return cleaned;
+      });
   }
 
   get(id) {
@@ -96,6 +105,9 @@ export class ResourceService {
     let resource = { id: parseInt(resp_obj.id) };
     Object.assign(resource, resp_obj.attributes);
     resource = this.cache_svc.set(type, resource.id, resource);
+    if (extensions[resp_obj.type]) {
+      extensions[resp_obj.type](resource);
+    }
 
     if (resp_obj.relationships) {
       Object.keys(resp_obj.relationships).forEach((rel_name) => {

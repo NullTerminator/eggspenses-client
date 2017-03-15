@@ -1,7 +1,13 @@
+import {inject} from 'aurelia-framework';
+
+import {GoogleChartService} from './google-chart-service';
 import * as routes from './routes';
 
+@inject(GoogleChartService)
 export class App {
-  constructor() {
+  constructor(chart_svc) {
+    google.charts.load('current', { packages: ['corechart'] });
+    google.charts.setOnLoadCallback(chart_svc.load.bind(chart_svc));
   }
 
   configureRouter(config, router) {

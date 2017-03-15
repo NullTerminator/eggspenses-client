@@ -1,3 +1,6 @@
 export function configure(config) {
-  //config.globalResources([]);
+  config.globalResources([
+    './widget-row.html',
+    './egg-chart.html'
+  ]);
 }

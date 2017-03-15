@@ -10,20 +10,19 @@ Promise.config({
 });
 
 export function configure(aurelia) {
-  load()
-    .then(() => {
-      aurelia.use
-        .standardConfiguration()
-        .feature('resources');
+  load().then(() => {
+    aurelia.use
+      .standardConfiguration()
+      .feature('resources');
 
-      if (environment.debug) {
-        aurelia.use.developmentLogging();
-      }
+    if (environment.debug) {
+      aurelia.use.developmentLogging();
+    }
 
-      if (environment.testing) {
-        aurelia.use.plugin('aurelia-testing');
-      }
+    if (environment.testing) {
+      aurelia.use.plugin('aurelia-testing');
+    }
 
-      aurelia.start().then(() => aurelia.setRoot());
-    });
+    aurelia.start().then(() => aurelia.setRoot());
+  });
 }
