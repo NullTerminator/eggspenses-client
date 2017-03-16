@@ -1,9 +1,10 @@
 import {ResourceService} from '../../src/resource-service';
+import {ResourceCacheService} from '../../src/resource-cache-service';
 
 import {resolving_promise_spy} from './promise-spy.js';
 
 describe('Resource Service', () => {
-  let svc, http_svc, old_env;
+  let svc, cache_svc, http_svc, old_env;
   let resource = 'foos';
   let items = [
     { id: 42 },
@@ -24,17 +25,18 @@ describe('Resource Service', () => {
 
   beforeEach(() => {
     http_svc = {};
+    cache_svc = new ResourceCacheService();
 
-    svc = new ResourceService(resource, http_svc);
+    svc = new ResourceService(resource, cache_svc, http_svc);
   });
 
   describe('creating', () => {
     let created = {
-      id: 29
+      id: '29'
     };
 
     beforeEach(() => {
-      http_svc.post = resolving_promise_spy('http_svc.post', created);
+      http_svc.post = resolving_promise_spy('http_svc.post', { data: created });
     });
 
     it('posts the params via the http service', (done) => {
@@ -50,7 +52,9 @@ describe('Resource Service', () => {
     it('returns a promise that resolves with the created resources', (done) => {
       svc.create({})
         .then((resp) => {
-          expect(resp).toEqual(created);
+          expect(resp).toEqual(jasmine.objectContaining({
+            id: 29
+          }));
         })
         .then(done);
     });
@@ -58,11 +62,14 @@ describe('Resource Service', () => {
 
   describe('getting one', () => {
     let item = {
-      name: 'foo'
+      id: '24',
+      attributes: {
+        name: 'foo'
+      }
     };
 
     beforeEach(() => {
-      http_svc.get = resolving_promise_spy('http_svc.get', item);
+      http_svc.get = resolving_promise_spy('http_svc.get', { data: item });
     });
 
     it('gets the resource from the http service', (done) => {
@@ -78,7 +85,10 @@ describe('Resource Service', () => {
     it('returns a promise that resolves with the resource', (done) => {
       svc.get(12)
         .then((resp) => {
-          expect(resp).toEqual(item);
+          expect(resp).toEqual(jasmine.objectContaining({
+            id: 24,
+            name: 'foo'
+          }));
         })
         .then(done);
     });
@@ -86,8 +96,9 @@ describe('Resource Service', () => {
 
   describe('retrieving all', () => {
     beforeEach(() => {
-      let resp = {};
-      resp[resource] = items;
+      let resp = {
+        data: items
+      };
       http_svc.get = resolving_promise_spy('http_svc.get', resp);
     });
 
@@ -110,7 +121,7 @@ describe('Resource Service', () => {
 
     describe('when there are no resources on the server', () => {
       beforeEach(() => {
-        http_svc.get = resolving_promise_spy('http_svc.get', {});
+        http_svc.get = resolving_promise_spy('http_svc.get', { data: [] });
       });
 
       it('returns a promise that resolves with an empty array', (done) => {
@@ -129,7 +140,7 @@ describe('Resource Service', () => {
 
     beforeEach(() => {
       item = {};
-      http_svc.put = resolving_promise_spy('http_svc.put');
+      http_svc.put = resolving_promise_spy('http_svc.put', { data: [] });
     });
 
     describe(`when resource is saved`, () => {
@@ -201,8 +212,9 @@ describe('Resource Service', () => {
 
   describe('deleting all', () => {
     beforeEach(() => {
-      let resp = {};
-      resp[resource] = items;
+      let resp = {
+        data: items
+      };
       http_svc.get = resolving_promise_spy('http_svc.get', resp);
       http_svc.delete = resolving_promise_spy('http_svc.delete');
     });

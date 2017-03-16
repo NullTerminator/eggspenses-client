@@ -143,8 +143,6 @@
           {
             "name": "bootstrap",
             "path": "../node_modules/bootstrap/dist",
-            "main": "js/bootstrap.min",
-            "exports": "$",
             "resources": [
               "css/bootstrap.css"
             ]

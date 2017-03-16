@@ -18,7 +18,7 @@ export class ResourceService {
   create(params) {
     return this.http_svc.post(this._url(), params)
       .then((response) => {
-        return this._resource_from_response(resp.data);
+        return this._resource_from_response(response.data);
       });
   }
 
@@ -45,7 +45,7 @@ export class ResourceService {
 
     return this.http_svc.put(this._url(resource.id), params)
       .then((response) => {
-        return this._resource_from_response(resp.data);
+        return this._resource_from_response(response.data);
       });
   }
 
