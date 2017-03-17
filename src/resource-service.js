@@ -26,11 +26,9 @@ export class ResourceService {
     //TODO: cache promise based on params
     return this.http_svc.get(this._url())
       .then((resp) => {
-        let cleaned = [];
-        resp.data.forEach((resource) => {
-          cleaned.push(this._resource_from_response(resource));
-        });
-        return cleaned;
+        return Promise.all(resp.data.map((resource) => {
+          return this._resource_from_response(resource);
+        }));
       });
   }
 
@@ -101,49 +99,56 @@ export class ResourceService {
   }
 
   _resource_from_response(resp_obj, type) {
-    type = type || this.resource_name;
-    let resource = { id: parseInt(resp_obj.id) };
-    Object.assign(resource, resp_obj.attributes);
-    resource = this.cache_svc.set(type, resource.id, resource);
-    if (extensions[resp_obj.type]) {
-      extensions[resp_obj.type](resource);
-    }
+    return new Promise((resolve) => {
+      type = type || this.resource_name;
+      let resource = { id: parseInt(resp_obj.id) };
+      Object.assign(resource, resp_obj.attributes);
+      resource = this.cache_svc.set(type, resource.id, resource);
+      if (extensions[resp_obj.type]) {
+        extensions[resp_obj.type](resource);
+      }
+      let promises = [];
 
-    if (resp_obj.relationships) {
-      Object.keys(resp_obj.relationships).forEach((rel_name) => {
-        let relation = resp_obj.relationships[rel_name].data;
+      if (resp_obj.relationships) {
+        Object.keys(resp_obj.relationships).forEach((rel_name) => {
+          let relation = resp_obj.relationships[rel_name].data;
 
-        if (Array.isArray(relation)) {
-          function by_id(id) {
-            return function(elem) {
-              return elem.id === id;
-            };
-          }
-
-          resource[rel_name] = resource[rel_name] || [];
-          relation.forEach((rel) => {
-            let rel_id = parseInt(rel.id);
-            let rel_type = rel.type.replace('-', '_');
-            // is this relation already loaded?
-            if (!resource[rel_name].find(by_id(rel_id))) {
-              // prep the cache with an object or get one out
-              this._get_resource(rel_type, rel_id);
-              resource[rel_name].push(this.cache_svc.set(rel_type, rel_id, { id: rel_id }));
+          if (Array.isArray(relation)) {
+            function by_id(id) {
+              return function(elem) {
+                return elem.id === id;
+              };
             }
-          });
-        } else {
-          if (resource[rel_name]) {
-            // relation is already there, do we need to do anything?
-          } else {
-            this._get_resource(relation.type, relation.id)
-              .then((res) => {
-                resource[rel_name] = res;
-              });
-          }
-        }
-      });
-    }
 
-    return resource;
+            resource[rel_name] = resource[rel_name] || [];
+            relation.forEach((rel) => {
+              let rel_id = parseInt(rel.id);
+              let rel_type = rel.type.replace('-', '_');
+              // is this relation already loaded?
+              if (!resource[rel_name].find(by_id(rel_id))) {
+                // prep the cache with an object or get one out
+                promises.push(this._get_resource(rel_type, rel_id));
+                resource[rel_name].push(this.cache_svc.set(rel_type, rel_id, { id: rel_id }));
+              }
+            });
+          } else {
+            if (resource[rel_name]) {
+              // relation is already there, do we need to do anything?
+            } else {
+              promises.push(this._get_resource(relation.type, relation.id)
+                .then((res) => {
+                  resource[rel_name] = res;
+                })
+              );
+            }
+          }
+        });
+      }
+
+      Promise.all(promises)
+        .then(() => {
+          resolve(resource);
+        });
+    });
   }
 }
