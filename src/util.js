@@ -1,10 +1,19 @@
-const months = [`Jan`, `Feb`, `Mar`, `Apr`, `May`, `Jun`, `Jul`, `Aug`, `Sep`, `Oct`, `Nov`, `Dec`];
+export const months = [`Jan`, `Feb`, `Mar`, `Apr`, `May`, `Jun`, `Jul`, `Aug`, `Sep`, `Oct`, `Nov`, `Dec`];
 
 export function date_format(date) {
-  let day = date.getDate();
-  let month = date.getMonth();
+  return date.toJSON().slice(0, 10);
+}
 
-  return `${months[month]} ${day} ${date.getYear()}`;
+export function today() {
+  let d = new Date();
+  d.setHours(0, 0, 0, 0);
+  return d;
+}
+
+export function days_ago(ago) {
+  let d = today();
+  d.setDate(d.getDate() - ago);
+  return d;
 }
 
 export function sort_by(arr, key_func) {
