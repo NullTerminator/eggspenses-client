@@ -16,6 +16,7 @@ export class App {
     let mapped_routes = [
       { route: ``, moduleId: `summary`, name: routes.SUMMARY },
       { route: `productions`, moduleId: `productions`, name: routes.PRODUCTIONS },
+      { route: `expenses`, moduleId: `expenses`, name: routes.EXPENSES },
     ];
 
     config.map(mapped_routes);
