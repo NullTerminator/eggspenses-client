@@ -18,10 +18,11 @@ describe(`Google Chart Service`, () => {
       { bar: 3, count: 8, foo: foo2 },
       { bar: 9, count: 13, foo: foo2 },
     ];
+    let rows = [3, 7, 9];
 
     let results;
     beforeEach(() => {
-      results = svc.chart_data(data, 'count', 'Zar', 'bar', (i) => { return i.foo.name; });
+      results = svc.chart_data(data, 'count', 'Zar', rows, 'bar', (i) => { return i.foo.name; });
     });
 
     it(`populates titles row`, () => {

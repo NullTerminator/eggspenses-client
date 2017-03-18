@@ -36,13 +36,15 @@ export class GoogleChartService {
   //
   //  row_title:  string title of the first column
   //
+  //  row_values: array of values for indexing into rows
+  //
   //  row_func:   string of attr name or function to call with an object
   //              to get its value.  The result of either is used to determine
   //              which row the object will be placed in
   //
   //  col_title_func:  a function to call with an object that will return the
   //                   title of the column it belongs in
-  chart_data(data, value_func, row_title, row_func, col_title_func) {
+  chart_data(data, value_func, row_title, row_vals, row_func, col_title_func) {
     value_func = ensure_attr_func(value_func);
     row_func = ensure_attr_func(row_func);
 
@@ -51,7 +53,7 @@ export class GoogleChartService {
     let titles = [row_title].concat(data.map(col_title_func).filter(unique).sort());
     results.push(titles);
 
-    let row_vals = data.map(row_func).filter(unique).sort();
+    //let row_vals = data.map(row_func).filter(unique).sort();
 
     //prepare with 0s
     row_vals.forEach((row_val) => {
