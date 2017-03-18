@@ -86,6 +86,28 @@ describe('Http Service', () => {
     });
   });
 
+  describe(`.get`, () => {
+    let path = 'foo';
+
+    it('makes a get call to the path', () => {
+      svc.get(path);
+
+      expect(xhr.open).toHaveBeenCalledWith('get', path);
+      expect(xhr.send).toHaveBeenCalled();
+    });
+
+    describe(`with params`, () => {
+      let params = { foo: `bar`, fiz: `bang` };
+
+      it('makes a get call to the path with the params as query args', () => {
+        svc.get(path, params);
+
+        expect(xhr.open).toHaveBeenCalledWith('get', `${path}?foo=bar&fiz=bang`);
+        expect(xhr.send).toHaveBeenCalled();
+      });
+    });
+  });
+
   describe('when an error occurs', () => {
     let path = 'foo';
 

@@ -20,16 +20,31 @@ export class ResourceService {
       .then((response) => {
         return this._resource_from_response(response.data);
       });
+    //TODO: send event for new resource
   }
 
-  all(params=null) {
-    //TODO: cache promise based on params
-    return this.http_svc.get(this._url())
+  all(params) {
+    let prom = this.cache_svc.get(this._promise_key(), `all`);
+
+    if (params === undefined && prom) {
+      return prom;
+    }
+
+    prom = this.http_svc.get(this._url(), params)
       .then((resp) => {
         return Promise.all(resp.data.map((resource) => {
           return this._resource_from_response(resource);
         }));
+      })
+      .finally(() => {
+        this.cache_svc.remove(this._promise_key(), `all`);
       });
+
+    if (params === undefined) {
+      prom = this.cache_svc.set(this._promise_key(), `all`, prom);
+    }
+
+    return prom;
   }
 
   get(id) {
@@ -56,6 +71,7 @@ export class ResourceService {
       .then(() => {
         this.cache_svc.remove(this.resource_name, resource.id);
       });
+    //TODO: send event for resource deleted
   }
 
   delete_all() {
@@ -76,9 +92,13 @@ export class ResourceService {
     return url;
   }
 
+  _promise_key(type) {
+    return `${type || this.resource_name}_promise`;
+  }
+
   _get_resource(type, id) {
     id = parseInt(id);
-    let promise_key = `${type}_promise`;
+    let promise_key = this._promise_key(type);
     let prom = this.cache_svc.get(promise_key, id);
     let resource = this.cache_svc.get(type, id);
 

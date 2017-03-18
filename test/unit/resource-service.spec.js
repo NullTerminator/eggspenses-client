@@ -105,7 +105,7 @@ describe('Resource Service', () => {
     it('gets the resources from the http service', (done) => {
       svc.all()
         .then((resp) => {
-          expect(http_svc.get).toHaveBeenCalledWith(`${api_host}/${resource}`);
+          expect(http_svc.get).toHaveBeenCalledWith(`${api_host}/${resource}`, undefined);
         })
         .then(done);
     });

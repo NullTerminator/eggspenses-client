@@ -11,7 +11,9 @@ export class HttpService {
 
   get(path, params) {
     if (params) {
-      //TODO: convert params to query params on path
+      path += `?` + Object.keys(params).map((k) => {
+        return `${encodeURIComponent(k)}=${encodeURIComponent(params[k])}`;
+      }).join(`&`);
     }
 
     return request(path, 'get');
