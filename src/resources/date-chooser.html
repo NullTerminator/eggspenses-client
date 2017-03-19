@@ -1,0 +1,14 @@
+<template>
+  <require from="./value-converters/date-format"></require>
+
+  <label repeat.for="option of options">
+    <input type="radio" name="dateOption" model.bind="option" checked.bind="$parent.selected_option" change.delegate="date_changed()"/>
+    ${option}
+  </label>
+
+  <div show.bind="custom">
+    <input type="text" value.bind="startDate | dateFormat & updateTrigger:'blur'">
+    to
+    <input type="text" id="tester" value.bind="endDate | dateFormat & updateTrigger:'blur'">
+  </div>
+</template>

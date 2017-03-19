@@ -1,19 +1,22 @@
 import {inject} from 'aurelia-framework';
 
+import {DateRangeWidget} from './date-range-widget';
 import {ProductionsService} from '../productions-service';
 import {GoogleChartService, LINE_CHART} from '../google-chart-service';
-import {date_format, months, today, days_ago} from '../util';
+import {date_format, months} from '../util';
 
 @inject(ProductionsService, GoogleChartService)
-export class ProductionsWidget {
+export class ProductionsWidget extends DateRangeWidget {
   constructor(prod_svc, chart_svc) {
+    super();
     this.chart_svc = chart_svc;
     this.prod_svc = prod_svc;
 
     this.chart_id = 'egg-chart-productions';
-    this.start_date = days_ago(6);
-    this.end_date = today();
+    this.init_dates();
+  }
 
+  make_request() {
     let params = {
       from_date: date_format(this.start_date),
       to_date: date_format(this.end_date)

@@ -16,6 +16,18 @@ export function days_ago(ago) {
   return d;
 }
 
+export function months_ago(ago) {
+  let d = today();
+  d.setMonth(d.getMonth() - ago);
+  return d;
+}
+
+export function years_ago(ago) {
+  let d = today();
+  d.setFullYear(d.getFullYear() - ago);
+  return d;
+}
+
 export function sort_by(arr, key_func) {
   key_func = ensure_attr_func(key_func);
 
