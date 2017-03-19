@@ -1,0 +1,27 @@
+<template>
+  <require from="./stat-widget.html"></require>
+  <require from="./value-converters/date-format"></require>
+
+  <stat-widget stat-title="Enter Productions">
+    <h4>${new_production.id ? 'Update' : 'New'} Production</h4>
+    <form submit.delegate="save()">
+      <select value.bind="selected_product">
+        <option repeat.for="product of products" model.bind="product">${product.name}</option>
+      </select>
+      <br/>
+      <label>
+        Date:
+        <input type="text" value.bind="date | dateFormat & updateTrigger:'blur'">
+      </label>
+      <button click.delegate="decrement_day()">- Day</button>
+      <button click.delegate="increment_day()">+ Day</button>
+      <br/>
+      <label>
+        Count:
+        <input type="number" min="0" value.bind="new_production.count"/>
+      </label>
+      <br/>
+      <button type="submit">Save</button>
+    </form>
+  </stat-widget>
+</template>

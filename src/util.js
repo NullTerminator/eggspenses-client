@@ -36,11 +36,11 @@ export function sort_by(arr, key_func) {
   });
 }
 
-export function by(key_func) {
+export function by(key_func, val) {
   key_func = ensure_attr_func(key_func);
 
   return (i) => {
-    return key_func(i);
+    return key_func(i) === val;
   }
 }
 
