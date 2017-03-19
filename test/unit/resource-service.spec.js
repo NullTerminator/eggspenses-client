@@ -1,10 +1,11 @@
 import {ResourceService} from '../../src/resource-service';
 import {ResourceCacheService} from '../../src/resource-cache-service';
+import events from '../../src/events';
 
 import {resolving_promise_spy} from './promise-spy.js';
 
 describe('Resource Service', () => {
-  let svc, cache_svc, http_svc, old_env;
+  let svc, cache_svc, http_svc, old_env, eventer;
   let resource = 'foos';
   let items = [
     { id: 42 },
@@ -24,10 +25,13 @@ describe('Resource Service', () => {
   });
 
   beforeEach(() => {
+    eventer = {
+      publish: jasmine.createSpy(`event_aggregator.publish`)
+    };
     http_svc = {};
     cache_svc = new ResourceCacheService();
 
-    svc = new ResourceService(resource, cache_svc, http_svc);
+    svc = new ResourceService(resource, cache_svc, http_svc, eventer);
   });
 
   describe('creating', () => {
@@ -50,9 +54,21 @@ describe('Resource Service', () => {
     });
 
     it('returns a promise that resolves with the created resources', (done) => {
-      svc.create({})
+      svc.create()
         .then((resp) => {
           expect(resp).toEqual(jasmine.objectContaining({
+            id: 29
+          }));
+        })
+        .then(done);
+    });
+
+    it(`publishes a resource created event`, (done) => {
+      svc.resource_name = 'productions';
+
+      svc.create({ product: { id: 12 } })
+        .then(() => {
+          expect(eventer.publish).toHaveBeenCalledWith(events.productions.CREATED, jasmine.objectContaining({
             id: 29
           }));
         })
@@ -140,7 +156,7 @@ describe('Resource Service', () => {
 
     beforeEach(() => {
       item = {};
-      http_svc.put = resolving_promise_spy('http_svc.put', { data: [] });
+      http_svc.put = resolving_promise_spy('http_svc.put', { data: item });
     });
 
     describe(`when resource is saved`, () => {
@@ -152,6 +168,16 @@ describe('Resource Service', () => {
         svc.update(item, params)
           .then(() => {
             expect(http_svc.put).toHaveBeenCalledWith(`${api_host}/${resource}/${item.id}`, params);
+          })
+          .then(done);
+      });
+
+      it(`publishes a resource updated event`, (done) => {
+        svc.resource_name = 'productions';
+
+        svc.update(item, { product: { id: 12 } })
+          .then(() => {
+            expect(eventer.publish).toHaveBeenCalledWith(events.productions.UPDATED, item);
           })
           .then(done);
       });
@@ -190,6 +216,17 @@ describe('Resource Service', () => {
         svc.delete(item)
           .then(() => {
             expect(http_svc.delete).toHaveBeenCalledWith(`${api_host}/${resource}/${item.id}`);
+          })
+          .then(done);
+      });
+
+      it(`publishes a resource deleted event`, (done) => {
+        svc.resource_name = 'productions';
+        cache_svc.set(svc.resource_name, item.id, item);
+
+        svc.delete(item)
+          .then(() => {
+            expect(eventer.publish).toHaveBeenCalledWith(events.productions.DELETED, item);
           })
           .then(done);
       });

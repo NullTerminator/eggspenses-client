@@ -1,14 +1,17 @@
 import {inject} from 'aurelia-framework';
+import {EventAggregator} from 'aurelia-event-aggregator';
 
 import {ResourceCacheService} from './resource-cache-service';
 import extensions from './resource-extensions';
 import resource_params from './resource-params';
+import events from './events';
 import {HttpService} from './http-service';
 import {HttpError} from './http-error';
 
-@inject(ResourceCacheService, HttpService)
+@inject(ResourceCacheService, HttpService, EventAggregator)
 export class ResourceService {
-  constructor(resource_name, cache_svc, http_svc) {
+  constructor(resource_name, cache_svc, http_svc, eventer) {
+    this.eventer = eventer;
     this.cache_svc = cache_svc;
     this.http_svc = http_svc;
 
@@ -19,9 +22,14 @@ export class ResourceService {
   create(params) {
     return this.http_svc.post(this._url(), this._safe_params(params))
       .then((response) => {
-        return this._resource_from_response(response.data);
+        return this._resource_from_response(response.data)
+          .then((resource) => {
+            if (events[this.resource_name]) {
+              this.eventer.publish(events[this.resource_name].CREATED, resource);
+            }
+            return resource;
+          });
       });
-    //TODO: send event for new resource
   }
 
   save(resource) {
@@ -67,7 +75,13 @@ export class ResourceService {
 
     return this.http_svc.put(this._url(resource.id), this._safe_params(params))
       .then((response) => {
-        return this._resource_from_response(response.data);
+        return this._resource_from_response(response.data)
+          .then((updated) => {
+            if (events[this.resource_name]) {
+              this.eventer.publish(events[this.resource_name].UPDATED, updated);
+            }
+            return resource;
+          });
       });
   }
 
@@ -78,9 +92,12 @@ export class ResourceService {
 
     return this.http_svc.delete(this._url(resource.id))
       .then(() => {
+        let deleted = this.cache_svc.get(this.resource_name, resource.id);
+        if (deleted && events[this.resource_name]) {
+          this.eventer.publish(events[this.resource_name].DELETED, deleted);
+        }
         this.cache_svc.remove(this.resource_name, resource.id);
       });
-    //TODO: send event for resource deleted
   }
 
   delete_all() {
