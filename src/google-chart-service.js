@@ -53,18 +53,17 @@ export class GoogleChartService {
     let titles = [row_title].concat(data.map(col_title_func).filter(unique).sort());
     results.push(titles);
 
-    //let row_vals = data.map(row_func).filter(unique).sort();
-
-    //prepare with 0s
+    //prepare with nulls
     row_vals.forEach((row_val) => {
-      let zeros = new Array(titles.length - 1).fill(0);
-      results.push([row_val].concat(zeros));
+      let nulls = new Array(titles.length - 1).fill(null);
+      results.push([row_val].concat(nulls));
     });
 
     //populate from data
     data.forEach((d) => {
       let row_i = row_vals.indexOf(row_func(d)) + 1; // Add one to offset title row
       let col_i = titles.indexOf(col_title_func(d));
+      results[row_i][col_i] = results[row_i][col_i] || 0;
       results[row_i][col_i] += value_func(d);
     });
 

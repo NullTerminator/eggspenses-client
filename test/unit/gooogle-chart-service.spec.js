@@ -33,7 +33,7 @@ describe(`Google Chart Service`, () => {
       expect(results.length).toEqual(4);
       expect(results[1]).toEqual([3, 1, 11]);
       expect(results[2]).toEqual([7, 4, 7]);
-      expect(results[3]).toEqual([9, 0, 13]);
+      expect(results[3]).toEqual([9, null, 13]);
     });
   });
 });
