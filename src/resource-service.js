@@ -2,6 +2,7 @@ import {inject} from 'aurelia-framework';
 
 import {ResourceCacheService} from './resource-cache-service';
 import extensions from './resource-extensions';
+import resource_params from './resource-params';
 import {HttpService} from './http-service';
 import {HttpError} from './http-error';
 
@@ -16,11 +17,19 @@ export class ResourceService {
   }
 
   create(params) {
-    return this.http_svc.post(this._url(), params)
+    return this.http_svc.post(this._url(), this._safe_params(params))
       .then((response) => {
         return this._resource_from_response(response.data);
       });
     //TODO: send event for new resource
+  }
+
+  save(resource) {
+    if (resource.id) {
+      return this.update(resource, resource);
+    } else {
+      return this.create(resource);
+    }
   }
 
   all(params) {
@@ -56,7 +65,7 @@ export class ResourceService {
       return Promise.reject(new Error(`Cannot update an unsaved resource.`));
     }
 
-    return this.http_svc.put(this._url(resource.id), params)
+    return this.http_svc.put(this._url(resource.id), this._safe_params(params))
       .then((response) => {
         return this._resource_from_response(response.data);
       });
@@ -170,5 +179,14 @@ export class ResourceService {
           resolve(resource);
         });
     });
+  }
+
+  _safe_params(params) {
+    let safe = resource_params[this.resource_name];
+    if (safe) {
+      params = safe(params);
+    }
+
+    return params;
   }
 }
