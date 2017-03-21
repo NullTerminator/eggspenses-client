@@ -22,6 +22,10 @@
       </label>
       <br/>
       <button type="submit">Save</button>
+      <span show.bind="new_production.id">
+        ---
+        <button click.delegate="delete()">X</button>
+      </span>
     </form>
   </stat-widget>
 </template>

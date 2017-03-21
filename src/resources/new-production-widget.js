@@ -43,6 +43,16 @@ export class NewProductionWidget {
       });
   }
 
+  delete() {
+    if (confirm(`Are you sure you want to delete this production?`)) {
+      return this.productions_svc.delete(this.new_production)
+        .then(() => {
+          this.new_production.id = null;
+          this.new_production.count = 0;
+        });
+    }
+  }
+
   increment_day() {
     // Need to assign a new obj to date to trigger observable changed
     this.date = new Date(this.date.getFullYear(), this.date.getMonth(), this.date.getDate() + 1);
