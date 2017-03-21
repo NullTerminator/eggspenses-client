@@ -6,9 +6,6 @@ export class DateRangeWidget {
   @observable start_date;
   @observable end_date;
 
-  constructor() {
-  }
-
   init_dates() {
     this.start_date = days_ago(6);
     this.end_date = today();
@@ -30,5 +27,9 @@ export class DateRangeWidget {
     if (this.start_date && this.end_date) {
       this.make_request();
     }
+  }
+
+  _is_in_range(resource) {
+    return this.start_date <= resource.date && this.end_date >= resource.date;
   }
 }
