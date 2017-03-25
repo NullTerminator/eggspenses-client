@@ -8,8 +8,8 @@ describe('Resource Service', () => {
   let svc, cache_svc, http_svc, old_env, eventer;
   let resource = 'foos';
   let items = [
-    { id: 42 },
-    { id: 711 }
+    { id: 42, type: 'foo' },
+    { id: 711, type: 'foo' }
   ];
   let api_host = 'fiz.com';
 
@@ -36,7 +36,8 @@ describe('Resource Service', () => {
 
   describe('creating', () => {
     let created = {
-      id: '29'
+      id: '29',
+      type: 'foo'
     };
 
     beforeEach(() => {
@@ -79,6 +80,7 @@ describe('Resource Service', () => {
   describe('getting one', () => {
     let item = {
       id: '24',
+      type: 'foo',
       attributes: {
         name: 'foo'
       }
@@ -155,7 +157,7 @@ describe('Resource Service', () => {
     let params = { foo: 'bar' };
 
     beforeEach(() => {
-      item = {};
+      item = { type: 'foo' };
       http_svc.put = resolving_promise_spy('http_svc.put', { data: item });
     });
 
@@ -203,7 +205,7 @@ describe('Resource Service', () => {
     let params = { foo: 'bar' };
 
     beforeEach(() => {
-      item = {};
+      item = { type: 'foo' };
       http_svc.delete = resolving_promise_spy('http_svc.delete');
     });
 
