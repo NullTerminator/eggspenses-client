@@ -11,6 +11,7 @@ const CUSTOM = 'Custom';
 
 @bindable('startDate')
 @bindable('endDate')
+@bindable('groupName')
 export class DateChooser {
   constructor() {
     this.options = [

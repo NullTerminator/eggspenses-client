@@ -2,7 +2,7 @@
   <require from="./value-converters/date-format"></require>
 
   <label repeat.for="option of options">
-    <input type="radio" name="dateOption" model.bind="option" checked.bind="$parent.selected_option" change.delegate="date_changed()"/>
+    <input type="radio" name.bind="'dateOption' + groupName" model.bind="option" checked.bind="$parent.selected_option" change.delegate="date_changed()"/>
     ${option}
   </label>
 
