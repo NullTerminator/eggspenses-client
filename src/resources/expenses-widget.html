@@ -1,0 +1,9 @@
+<template>
+  <require from="./stat-widget.html"></require>
+  <require from="./date-chooser"></require>
+
+  <stat-widget stat-title="Expenses">
+    <date-chooser start-date.two-way="start_date" end-date.two-way="end_date"></date-chooser>
+    <egg-chart chart-id.bind="chart_id"></egg-chart>
+  </stat-widget>
+</template>
