@@ -1,6 +1,6 @@
 import {observable} from 'aurelia-framework';
 
-import {today, days_ago} from '../util';
+import {chart_date_format, date_range, date_format, today, days_ago} from '../util';
 
 export class DateRangeWidget {
   @observable start_date;
@@ -9,6 +9,23 @@ export class DateRangeWidget {
   init_dates() {
     this.start_date = days_ago(6);
     this.end_date = today();
+  }
+
+  date_params() {
+    return {
+      from_date: date_format(this.start_date),
+      to_date: date_format(this.end_date)
+    };
+  }
+
+  date_range() {
+    return date_range(this.start_date, this.end_date);
+  }
+
+  date_range_strings() {
+    let range = date_range(this.start_date, this.end_date);
+    range = range.map((d) => { return chart_date_format(d); });
+    return range;
   }
 
   start_dateChanged(new_val, old_val) {

@@ -4,6 +4,31 @@ export function date_format(date) {
   return date.toJSON().slice(0, 10);
 }
 
+export function chart_date_format(date) {
+  let day = date.getDate();
+  let month = date.getMonth();
+
+  return `${months[month]} ${day} ${date.getFullYear()}`;
+}
+
+export function parse_api_date(date) {
+  let parts = date.split('-');
+  return new Date(parts[0], parts[1]-1, parts[2]);
+}
+
+export function date_range(from, to) {
+  let range = [];
+  let date = new Date(from.getTime());
+  while (true) {
+    range.push(new Date(date.getTime()));
+    if (date.getTime() === to.getTime()) {
+      break;
+    }
+    date.setDate(date.getDate() + 1);
+  }
+  return range;
+}
+
 export function today() {
   let d = new Date();
   d.setHours(0, 0, 0, 0);
