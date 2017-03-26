@@ -1,4 +1,4 @@
-import {date_range} from './util';
+import {date_range, sum} from './util';
 
 export class ProfitCalculator {
   constructor(sale_items, productions, daily_expenses) {
@@ -14,7 +14,8 @@ export class ProfitCalculator {
       this.sale_items.forEach((item) => {
         if (production.product === item.product) {
           let daily_expense = this._get_daily_expense_for(production.date, item.product.asset);
-          let profit = (production.count / item.product_count) * item.price - daily_expense.amount;
+          let item_net = item.price - sum(item.expenses, `price`);
+          let profit = (production.count / item.product_count) * item_net - daily_expense.amount;
           vals.push(new DailyProfit(profit, production.date, item));
         }
       });

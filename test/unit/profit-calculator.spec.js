@@ -28,8 +28,9 @@ describe(`Profit Calculator`, () => {
 
   let asset2 = { name: 'Sticks' };
   let product2 = { name: 'splinters', asset: asset2 };
-  let sale_item2 = { name: 'Tons O Splinters', price: 0.95, product_count: 50, product: product2, expenses: [expense2] }
+  let sale_item2 = { name: 'Tons O Splinters', price: 0.95, product_count: 50, product: product2, expenses: [] }
   let expense2 = { name: 'Bandaids', price: 0.1, expensable: sale_item2 };
+  sale_item2.expenses.push(expense2);
   let productions2 = [
     { count: 10, date: days_ago(3), product: product2 },
     { count: 20, date: days_ago(2), product: product2 },
@@ -41,9 +42,9 @@ describe(`Profit Calculator`, () => {
     { amount: 0.2, date: days_ago(1), asset: asset2 },
   ];
   let expected2 = [
-    { amount: (10 / 50) * 0.95 - 0.2, date: days_ago(3), sale_item: sale_item2 },
-    { amount: (20 / 50) * 0.95 - 0.2, date: days_ago(2), sale_item: sale_item2 },
-    { amount: (30 / 50) * 0.95 - 0.2, date: days_ago(1), sale_item: sale_item2 },
+    { amount: (10 / 50) * 0.85 - 0.2, date: days_ago(3), sale_item: sale_item2 },
+    { amount: (20 / 50) * 0.85 - 0.2, date: days_ago(2), sale_item: sale_item2 },
+    { amount: (30 / 50) * 0.85 - 0.2, date: days_ago(1), sale_item: sale_item2 },
   ];
 
   describe(`calculating daily profits`, () => {
@@ -64,6 +65,12 @@ describe(`Profit Calculator`, () => {
 
     it(`returns an expense for asset1 each day`, () => {
       expected1.forEach((e) => {
+        expect(calculated).toContain(jasmine.objectContaining(e));
+      });
+    });
+
+    it(`returns an expense for asset2 each day`, () => {
+      expected2.forEach((e) => {
         expect(calculated).toContain(jasmine.objectContaining(e));
       });
     });
