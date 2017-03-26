@@ -10,10 +10,11 @@ import {ProductionsService} from '../productions-service';
 import {ExpenseCalculator} from '../expense-calculator';
 import {ProfitCalculator} from '../profit-calculator';
 import {chart_date_format, sum} from '../util';
+import events from '../events';
 
-@inject(ExpensesService, AssetEventsService, SaleItemsService, ProductionsService, GoogleChartService)
+@inject(ExpensesService, AssetEventsService, SaleItemsService, ProductionsService, GoogleChartService, EventAggregator)
 export class ProfitsWidget extends DateRangeWidget {
-  constructor(expenses_svc, asset_events_svc, sale_items_svc, prod_svc, chart_svc) {
+  constructor(expenses_svc, asset_events_svc, sale_items_svc, prod_svc, chart_svc, eventer) {
     super();
     this.chart_svc = chart_svc;
     this.expenses_svc = expenses_svc;
@@ -23,6 +24,10 @@ export class ProfitsWidget extends DateRangeWidget {
 
     this.chart_id = 'eggs-chart-profits';
     this.init_dates();
+
+    eventer.subscribe(events.productions.CREATED, this._check_add_production.bind(this));
+    eventer.subscribe(events.productions.UPDATED, this._check_add_production.bind(this));
+    eventer.subscribe(events.productions.DELETED, this._check_remove_production.bind(this));
   }
 
   make_request() {
@@ -67,5 +72,22 @@ export class ProfitsWidget extends DateRangeWidget {
     );
 
     this.chart_svc.draw(LINE_CHART, this.chart_id, data, options);
+  }
+
+  _check_add_production(production) {
+    if (this._is_in_range(production)) {
+      if (this.productions.indexOf(production) === -1) {
+        this.productions.push(production);
+      }
+      this._draw_chart();
+    }
+  }
+
+  _check_remove_production(production) {
+    let i = this.productions.indexOf(production);
+    if (i !== -1) {
+      this.productions.splice(i, 1);
+      this._draw_chart();
+    }
   }
 }
