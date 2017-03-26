@@ -43,11 +43,11 @@ export class ExpenseCalculator {
   _get_expense_for_day(asset, date) {
     let expenses = this.expenses.filter((e) => {
       let good = e.expensable === asset;
-      if (e.start_date) {
-        good = good && date >= e.start_date;
+      if (good && e.start_date) {
+        good = date >= e.start_date;
       }
-      if (e.end_date) {
-        good = good && date <= e.end_date;
+      if (good && e.end_date) {
+        good = date <= e.end_date;
       }
       return good;
     });
