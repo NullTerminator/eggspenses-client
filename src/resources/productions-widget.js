@@ -31,6 +31,10 @@ export class ProductionsWidget extends DateRangeWidget {
   }
 
   _draw_chart() {
+    if (this.productions.length === 0) {
+      return;
+    }
+
     let options = {
       legend: { position: 'bottom' }
     };

@@ -33,6 +33,10 @@ export class ExpensesWidget extends DateRangeWidget {
   }
 
   _draw_chart() {
+    if (this.expenses.length === 0) {
+      return;
+    }
+
     let options = {
       legend: { position: 'bottom' }
     };
