@@ -8,8 +8,8 @@ describe('Resource Service', () => {
   let svc, cache_svc, http_svc, old_env, eventer;
   let resource = 'foos';
   let items = [
-    { id: 42, type: 'foo' },
-    { id: 711, type: 'foo' }
+    { id: 42, type: 'foo', attributes: [] },
+    { id: 711, type: 'foo', attributes: [] }
   ];
   let api_host = 'fiz.com';
 
@@ -37,7 +37,8 @@ describe('Resource Service', () => {
   describe('creating', () => {
     let created = {
       id: '29',
-      type: 'foo'
+      type: 'foo',
+      attributes: []
     };
 
     beforeEach(() => {
@@ -131,8 +132,8 @@ describe('Resource Service', () => {
     it('returns a promise that resolves with the array of resources', (done) => {
       svc.all()
         .then((resp) => {
-          expect(resp).toContain(items[0]);
-          expect(resp).toContain(items[1]);
+          expect(resp).toContain(jasmine.objectContaining({ id: items[0].id }));
+          expect(resp).toContain(jasmine.objectContaining({ id: items[1].id }));
         })
         .then(done);
     });
@@ -157,7 +158,7 @@ describe('Resource Service', () => {
     let params = { foo: 'bar' };
 
     beforeEach(() => {
-      item = { type: 'foo' };
+      item = { type: 'foo', attributes: [] };
       http_svc.put = resolving_promise_spy('http_svc.put', { data: item });
     });
 
@@ -179,7 +180,9 @@ describe('Resource Service', () => {
 
         svc.update(item, { product: { id: 12 } })
           .then(() => {
-            expect(eventer.publish).toHaveBeenCalledWith(events.productions.UPDATED, item);
+            expect(eventer.publish).toHaveBeenCalledWith(events.productions.UPDATED, jasmine.objectContaining({
+              id: item.id
+            }));
           })
           .then(done);
       });
@@ -205,7 +208,7 @@ describe('Resource Service', () => {
     let params = { foo: 'bar' };
 
     beforeEach(() => {
-      item = { type: 'foo' };
+      item = { type: 'foo', attributes: [] };
       http_svc.delete = resolving_promise_spy('http_svc.delete');
     });
 

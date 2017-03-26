@@ -8,11 +8,11 @@ export default {
   },
 
   expenses: (expense) => {
-    if (typeof expense['start-date'] === 'string') {
-      expense.start_date = parse_api_date(expense['start-date']);
+    if (typeof expense.start_date === 'string') {
+      expense.start_date = parse_api_date(expense.start_date);
     }
-    if (typeof expense['end-date'] === 'string') {
-      expense.end_date = parse_api_date(expense['end-date']);
+    if (typeof expense.end_date === 'string') {
+      expense.end_date = parse_api_date(expense.end_date);
     }
   },
 

@@ -110,7 +110,7 @@ export class ResourceService {
   }
 
   _url(path = null, resource = null) {
-    resource = (resource || this.resource_name).replace(/[_-]/g, '_');
+    resource = dash_to_skid(resource || this.resource_name);
     let url = `${window.env.EGGSPENSES_API_HOST}/${resource}`;
     if (path) {
       url = `${url}/${path}`;
@@ -147,10 +147,12 @@ export class ResourceService {
   _resource_from_response(resp_obj, type) {
     return new Promise((resolve) => {
       type = type || this.resource_name;
-      let resource = { id: parseInt(resp_obj.id), type: resp_obj.type };
-      Object.assign(resource, resp_obj.attributes);
+      let resource = { id: parseInt(resp_obj.id) };
+      Object.keys(resp_obj.attributes).forEach((key) => {
+        resource[dash_to_skid(key)] = resp_obj.attributes[key];
+      });
       resource = this.cache_svc.set(type, resource.id, resource);
-      let resp_type = resp_obj.type.replace(/[_-]/g, '_');
+      let resp_type = dash_to_skid(resp_obj.type);
       if (extensions[resp_type]) {
         extensions[resp_type](resource);
       }
@@ -170,7 +172,7 @@ export class ResourceService {
             resource[rel_name] = resource[rel_name] || [];
             relation.forEach((rel) => {
               let rel_id = parseInt(rel.id);
-              let rel_type = rel.type.replace(/[_-]/g, '_');
+              let rel_type = dash_to_skid(rel.type);
               // is this relation already loaded?
               if (!resource[rel_name].find(by_id(rel_id))) {
                 // prep the cache with an object or get one out
@@ -207,4 +209,8 @@ export class ResourceService {
 
     return params;
   }
+}
+
+function dash_to_skid(str) {
+  return str.replace(/[_-]/g, '_');
 }
