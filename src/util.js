@@ -69,6 +69,11 @@ export function by(key_func, val) {
   }
 }
 
+export function sum(arr, key_func) {
+  key_func = ensure_attr_func(key_func);
+  return arr.reduce((sum, i) => { return sum + key_func(i); }, 0.0);
+}
+
 export function group_by(arr, key_func) {
   key_func = ensure_attr_func(key_func);
   let group_keys = [];

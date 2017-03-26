@@ -9,7 +9,7 @@ import {SaleItemsService} from '../sale-items-service';
 import {ProductionsService} from '../productions-service';
 import {ExpenseCalculator} from '../expense-calculator';
 import {ProfitCalculator} from '../profit-calculator';
-import {chart_date_format} from '../util';
+import {chart_date_format, sum} from '../util';
 
 @inject(ExpensesService, AssetEventsService, SaleItemsService, ProductionsService, GoogleChartService)
 export class ProfitsWidget extends DateRangeWidget {
@@ -51,6 +51,7 @@ export class ProfitsWidget extends DateRangeWidget {
 
     let profits_calc = new ProfitCalculator(this.sale_items, this.productions, daily_expenses);
     let daily_profits = profits_calc.calculate(this.start_date, this.end_date);
+    this.total_profit = sum(daily_profits, `amount`);
 
     let data = this.chart_svc.chart_data(
       daily_profits,

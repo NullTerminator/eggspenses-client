@@ -1,4 +1,4 @@
-import {by, date_range, group_by, sort_by} from './util';
+import {by, date_range, group_by, sort_by, sum} from './util';
 
 export class ExpenseCalculator {
   constructor(expenses, asset_events) {
@@ -52,7 +52,7 @@ export class ExpenseCalculator {
       return good;
     });
 
-    return expenses.reduce((sum, expense) => { return sum + expense.price; }, 0.0);
+    return sum(expenses, `price`);
   }
 }
 

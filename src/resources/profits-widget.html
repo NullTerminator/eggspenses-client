@@ -1,9 +1,14 @@
 <template>
   <require from="./stat-widget.html"></require>
   <require from="./date-chooser"></require>
+  <require from="./value-converters/currency"></require>
 
   <stat-widget stat-title="Profits">
     <date-chooser group-name="profits" start-date.two-way="start_date" end-date.two-way="end_date"></date-chooser>
     <egg-chart chart-id.bind="chart_id"></egg-chart>
+    <br/>
+    <div class.bind="total_profit > 0 ? 'alert alert-success' : 'alert alert-danger'">
+      <strong>Total:</strong> ${total_profit | currency}
+    </div>
   </stat-widget>
 </template>
