@@ -1,0 +1,19 @@
+{
+  "hosting": {
+    "public": ".",
+    "ignore": [
+      "firebase.json",
+      "**/.*",
+      "**/node_modules/**",
+      "**/aurelia_project/**",
+      "**/src/**",
+      "**/test/**"
+    ],
+    "rewrites": [
+      {
+        "source": "**.html",
+        "destination": "/index.html"
+      }
+    ]
+  }
+}
